@@ -2,12 +2,11 @@ import pyautogui
 import time
 import random
 
-from constants import *
 from config import *
 
 # PyAutoGui functions
 
-def pressKey(key, times = 1, interval = 1):
+def pressKey(key, times = 1, interval = DELAY_BETWEEN_COMMANDS):
     for i in range(0, times):
         pyautogui.press(key)
         time.sleep(interval)

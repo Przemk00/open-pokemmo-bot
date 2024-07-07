@@ -4,8 +4,8 @@ import sys
 import random
 
 from utils import *
-from constants import *
 from config import *
+from payday import *
 
 def checkPokedex():
     time.sleep(.2)
@@ -59,7 +59,7 @@ def tryToFish():
     # Wait for fishing timer
     time.sleep(2.2)
     # Check if fish was hooked
-    for i in range(4):
+    for i in range(5):
         noFishHooked = pyautogui.locateOnScreen('poke_img/720_not_even_a_nibble_' + str(i) + '.png')
         fishIsHooked = pyautogui.locateOnScreen('poke_img/720_landed_a_pokemon_' + str(i) + '.png')
         print('hooked', fishIsHooked, noFishHooked)
@@ -73,7 +73,7 @@ def tryToFish():
     if (hooked):
         print('Fish is hooked!')
         # Dismiss "Landed a Pokemon" message
-        pressKey('space')
+        pressKey(A_BUTTON)
         # Wait for battle to start
         time.sleep(5.9)
         result = catchFish()
@@ -128,28 +128,6 @@ def kantoFish():
     pressKey('esc')
     pressKey('space', 3)
 
-def walkToIsland2Grass():
-    # Mount bike
-    pressKey('4')
-    # Ride to spot
-    holdKey('d', .55)
-    holdKey('w', .35)
-    holdKey('d', .7)
-    holdKey('w', 1)
-    holdKey('a', .7)
-    holdKey('w', 1)
-
-def island2Payday():
-    walkToIsland2Grass()
-
-def walkToIsland5Grass():
-    # Mount bike
-    pressKey('4')
-    # Ride to spot
-
-def island5Payday():
-    walkToIsland5Grass()
-
 def main():
     # Initialize PyAutoGUI
     pyautogui.FAILSAFE = True
@@ -165,7 +143,7 @@ def main():
     elif (sys.argv[1] == "payday"):
         print("Payday time...")
         startCountDown()
-        island2Payday()
+        island6Payday()
 
     print("Done")
 
