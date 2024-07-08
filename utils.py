@@ -8,7 +8,9 @@ from config import *
 
 def pressKey(key, times = 1, interval = DELAY_BETWEEN_COMMANDS):
     for i in range(0, times):
-        pyautogui.press(key)
+        pyautogui.keyDown(key)
+        time.sleep(.1)
+        pyautogui.keyUp(key)
         time.sleep(interval)
 
 def moveMouse(x, y):

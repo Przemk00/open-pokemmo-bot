@@ -131,19 +131,17 @@ def kantoFish():
 def main():
     # Initialize PyAutoGUI
     pyautogui.FAILSAFE = True
+    startCountDown()
 
     if (len(sys.argv) == 1):
         print("Loading default fisher")
-        startCountDown()
         kantoFish();
     elif (sys.argv[1] == "fish"):
         print("Fishing...")
-        startCountDown()
         simpleFishLoop()
     elif (sys.argv[1] == "payday"):
         print("Payday time...")
-        startCountDown()
-        island6Payday()
+        cinnabarPayday()
 
     print("Done")
 
