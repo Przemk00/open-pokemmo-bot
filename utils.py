@@ -9,28 +9,35 @@ from config import *
 def pressKey(key, times = 1, interval = DELAY_BETWEEN_COMMANDS):
     for i in range(0, times):
         pyautogui.keyDown(key)
-        time.sleep(.1)
+        time.sleep(.08)
         pyautogui.keyUp(key)
-        time.sleep(interval)
+        time.sleep(interval + shortTime())
+
+def typeWord(word):
+    for i in word:
+        pressKey(i)
 
 def moveMouse(x, y):
     pyautogui.moveTo(x, y)
-    time.sleep(DELAY_BETWEEN_COMMANDS)
+    time.sleep(randomTime())
 
 def moveMouseAndClick(x, y, button):
     pyautogui.click(x=x, y=y, button=button)
-    time.sleep(DELAY_BETWEEN_COMMANDS)
+    time.sleep(randomTime())
 
 def holdKey(key, seconds=1):
     pyautogui.keyDown(key)
     time.sleep(seconds)
     pyautogui.keyUp(key)
-    time.sleep(DELAY_BETWEEN_COMMANDS)
+    time.sleep(shortTime())
 
 # General
 
+def shortTime():
+    return random.randrange(1, 4) / 100
+
 def randomTime():
-    return random.randrange(5, 100) / 100
+    return random.randrange(2, 20) / 100
 
 def startCountDown():
     # Countdown timer
