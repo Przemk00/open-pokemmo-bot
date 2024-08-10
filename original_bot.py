@@ -13,18 +13,6 @@ from utils import *
 from constants import *
 from config import *
 
-def checkPokedex():
-    time.sleep(.2)
-    pressKey('n')
-    time.sleep(0.2 + randomTime() * 3)
-    pressKey('n')
-
-def checkTrainer():
-    time.sleep(.2)
-    pressKey('c')
-    time.sleep(0.2 + randomTime() * 3)
-    pressKey('c')
-
 def talkToReceptionist():
     print('Talking to receptionist')
     pressKey('z', 11, 1.1)
@@ -35,7 +23,6 @@ def walkToFishingSpot():
     holdKey('up', 1.5)
     holdKey('right', 0.9)
     holdKey('up', .4)
- #   holdKey('left', .4)
 
 def catchFish():
     while True:
