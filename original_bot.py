@@ -22,7 +22,7 @@ def talkToReceptionist():
 def walkToFishingSpot():
     logger.info('Walk to fishing spot...')
     holdKey('up', 1.5)
-    holdKey('right', 1.0)
+    holdKey('right', 0.95)
     holdKey('up', .4)
  #   holdKey('left', .4)
 
@@ -81,6 +81,9 @@ def tryToFish():
         pressKey('down')
         time.sleep(0.5)
         pressKey('z')
+        result = catchFish()
+        if result == 'failed':
+            time.sleep(1)  
         time.sleep(4.5)
         pressKey('z')
         time.sleep(0.5)
@@ -112,9 +115,9 @@ def simpleFishLoop():
 
 def kantoFish():
     logger.info('Begin Kanto safari fish...')
-    #holdKey('up', .4)
-    #talkToReceptionist()
-    walkToFishingSpot()
+    holdKey('up', .4)
+    # talkToReceptionist()
+    # walkToFishingSpot()
     numFish = 30
     while (numFish > 0):
         result = tryToFish()
