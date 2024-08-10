@@ -43,16 +43,18 @@ def tryToFish():
     time.sleep(randomTime())
     pressKey(OLD_ROD_KEY)
     # Wait for fishing timer
-    time.sleep(2.2)
+    time.sleep(7)
     # Check if fish was hooked
     for i in range(4):
-        noFishHooked = pyautogui.locateOnScreen('poke_img/720_not_even_a_nibble_' + str(i) + '.png')
-        fishIsHooked = pyautogui.locateOnScreen('poke_img/720_landed_a_pokemon_' + str(i) + '.png')
+        fishIsHooked = pyautogui.locateOnScreen('poke_img/720_landed_a_pokemon_0.png', confidence=0.6) 
+        noFishHooked = pyautogui.locateOnScreen('poke_img/720_not_even_a_nibble_0.png', confidence=0.6)
+        #noFishHooked = pyautogui.locateOnScreen('poke_img/720_not_even_a_nibble_' + str(i) + '.png', confidence=0.6)
+        #fishIsHooked = pyautogui.locateOnScreen('poke_img/720_landed_a_pokemon_' + str(i) + '.png', confidence=0.6)
         print('hooked', fishIsHooked, noFishHooked)
         if (noFishHooked != None or fishIsHooked != None):
             break
     hooked = False
-    if (fishIsHooked != None):
+    if (fishIsHooked != None):  
         hooked = True
     elif (noFishHooked == None):
         return 'Failed to identify hook'
