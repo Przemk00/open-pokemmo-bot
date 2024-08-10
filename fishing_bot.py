@@ -1,4 +1,3 @@
-2# fishing_bot.py
 import pyautogui
 import time
 import sys
@@ -8,81 +7,73 @@ from utils import *
 from constants import *
 from config import *
 
-# Importing functions from your original script (assuming it's named original_bot.py)
-from original_bot import (
-    talkToReceptionist,
-    walkToFishingSpot,
-    catchFish,
-    simpleFishLoop,
-)
-
-def kantoFish():
-    print('Begin Kanto safari fish!')
-    # start fishing loop
-    numFish = 30
-    while(numFish > 0):
-        num = randomTime()
-        if (num < .08):
-            checkPokedex()
-        elif (num > .95):
-            checkTrainer()
-        result = tryToFish()
-        print('Fish result:', result)
-        if (result == 'success'):
-            numFish -= 1
-        if (result == 'Failed to identify hook'):
-            return
-    # Finish safari sequence
-    time.sleep(1)
-    pressKey('esc')
-    pressKey('z', 3)
-
 def tryToFish():
     print('Try to catch a fish')
-    # Randomize start time
-    time.sleep(randomTime())
     pressKey(OLD_ROD_KEY)
-    # Wait for fishing timer
-    time.sleep(7)
-    # Check if fish was hooked
-    for i in range(4):
-        fishIsHooked = pyautogui.locateOnScreen('poke_img/720_landed_a_pokemon_0.png', confidence=0.6) 
+    time.sleep(5)
+    try:
+        # Check if fish is hooked or not
+        fishIsHooked = pyautogui.locateOnScreen('poke_img/720_landed_a_pokemon_0.png', confidence=0.6)
+    except pyautogui.ImageNotFoundException:
+        fishIsHooked = None 
+    try:
         noFishHooked = pyautogui.locateOnScreen('poke_img/720_not_even_a_nibble_0.png', confidence=0.6)
-        #noFishHooked = pyautogui.locateOnScreen('poke_img/720_not_even_a_nibble_' + str(i) + '.png', confidence=0.6)
-        #fishIsHooked = pyautogui.locateOnScreen('poke_img/720_landed_a_pokemon_' + str(i) + '.png', confidence=0.6)
-        print('hooked', fishIsHooked, noFishHooked)
-        if (noFishHooked != None or fishIsHooked != None):
-            break
-    hooked = False
-    if (fishIsHooked != None):  
-        hooked = True
-    elif (noFishHooked == None):
-        return 'Failed to identify hook'
-    if (hooked):
-        print('Fish is hooked!')
-        # Dismiss "Landed a Pokemon" message
+    except pyautogui.ImageNotFoundException:
+        noFishHooked = None
+    
+     # Check if either image was found
+    if fishIsHooked is not None:
+        print("Fish is hooked!")
+    elif noFishHooked is not None:
+        print("No fish hooked.")
+    else:
+        print("Failed to identify hook status. Neither fish hooked nor no fish hooked detected.")
+        return  # Exit the function if neither image was found
+        
+    if fishIsHooked is not None:
+        time.sleep(3)
         pressKey('z')
-        # Wait for battle to start
-        time.sleep(5.9)
         result = catchFish()
-        if (result == 'success'):
-            time.sleep(randomTime())
+        if result == 'success':
+            time.sleep(2)
             # Dismiss summary screen
             pressKey('esc')
-            return result
-    else:
-        pressKey('z')
+        return result
+    else: 
+        time.sleep(2)
+        pressKey('x')
         return 'failed'
 
-def main():
-    # Initialize PyAutoGUI
-    pyautogui.FAILSAFE = True
-    time.sleep(5)
-    # Start fishing process
-    print("Starting the fishing process...")
-    kantoFish()  # or simpleFishLoop() depending on what you want to run
+def catchFish():
+    while True:
+        time.sleep(2)
+        pressKey('z')
+        time.sleep(2.52)
 
-    print("Fishing done!")
+        try:
+            fledResult = pyautogui.locateOnScreen('poke_img/720_fled_from.png', confidence=0.6)
+            if fledResult is not None:
+                print('FLED:', fledResult)
+                return 'failed'
+        except pyautogui.ImageNotFoundException:
+            pass
+
+        try:
+            pokeSummaryShown = pyautogui.locateOnScreen('poke_img/720_pokemon_summary_0.png', confidence=0.6)
+            if pokeSummaryShown is not None:
+                print(f'Pokemon Summary Found at: {pokeSummaryShown}')
+                return 'success'
+            else:
+                print('Summary not found, continuing...')
+        except pyautogui.ImageNotFoundException:
+            print('Summary ImageNotFoundException, continuing...')
+
+        print("No result yet, continuing to wait...")
+        time.sleep(0.5)
+
+def main():
+    time.sleep(3)
+    tryToFish()
 
 if __name__ == "__main__":
     main()
