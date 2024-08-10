@@ -32,8 +32,8 @@ def talkToReceptionist():
 
 def walkToFishingSpot():
     print('Walk to fishing spot')
-    holdKey('up', 1.2)
-    holdKey('right', 0.8)
+    holdKey('up', 1.5)
+    holdKey('right', 0.9)
     holdKey('up', .4)
  #   holdKey('left', .4)
 
@@ -93,8 +93,6 @@ def tryToFish():
         time.sleep(0.5)
         pressKey('z')
         time.sleep(4.5)
-        pressKey('up')
-        time.sleep(0.5)
         pressKey('z')
         time.sleep(0.5)
         result = catchFish()
@@ -126,8 +124,8 @@ def simpleFishLoop():
 
 def kantoFish():
     print('Begin Kanto safari fish!')
-    holdKey('up', .4)
-    talkToReceptionist()
+    #holdKey('up', .4)
+    #talkToReceptionist()
     walkToFishingSpot()
     numFish = 30
     while (numFish > 0):
