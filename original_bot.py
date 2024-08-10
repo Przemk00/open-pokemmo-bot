@@ -36,7 +36,6 @@ def catchFish():
             #logger.info(f"Fled result: {fledResult}")
             if fledResult is not None:
                 logger.info('FLED...')
-                pressKey('esc')
                 return 'failed'
 
         # Check for 'summary' result
@@ -77,13 +76,18 @@ def tryToFish():
     if fishIsHooked is not None:
         time.sleep(3.5)
         pressKey('z')
-        time.sleep(5.0)
+        time.sleep(5)
         pressKey('down')
         time.sleep(0.5)
         pressKey('z')
-        result = catchFish()
-        if result == 'failed':
-            time.sleep(1)  
+        time.sleep(2)
+        with contextlib.suppress(pyautogui.ImageNotFoundException):
+                logger.info("Checking if Pokémon fled after throwing rock...")
+                fledResult = pyautogui.locateOnScreen('poke_img/720_fled_from.png', confidence=0.6)
+                if fledResult is not None:
+                    logger.info('FLED...')
+                    return 'failed'        
+        
         time.sleep(4.5)
         pressKey('z')
         time.sleep(0.5)
