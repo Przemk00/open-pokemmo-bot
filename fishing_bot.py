@@ -12,17 +12,19 @@ import os
 #from utils import *
 from constants import *
 from config import *
+from utils import *
 
 def talkToReceptionist():
     print('Talking to receptionist')
+    pressKey('up', 2.2)
     pressKey('z', 11, 1.1)
     time.sleep(1.4)
 
 def walkToFishingSpot():
     print('Walk to fishing spot')
-    holdKey('up', 2.2)
-    holdKey('right', 1.4)
-    holdKey('up', .4)
+    pressKey('up', 2.2)
+    pressKey('right', 1.4)
+    pressKey('up', .4)
 
 def capture_screen_and_read_balls():
     # Define the path where the screenshot will be saved
@@ -63,11 +65,6 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-def pressKey(key, duration=0.1):
-    pyautogui.keyDown(key)
-    time.sleep(duration)
-    pyautogui.keyUp(key)
     
 def tryToFish():
     print('Try to catch a fish')
@@ -145,6 +142,8 @@ def catchFish():
         print("No result yet, waiting or throwing another ball...")
 
 def main():
+    talkToReceptionist()
+    walkToFishingSpot()
     time.sleep(3)
     for i in range(30):
             print(f"Attempt {i + 1} of 30:")

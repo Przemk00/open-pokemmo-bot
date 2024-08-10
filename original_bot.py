@@ -27,9 +27,9 @@ def talkToReceptionist():
 def walkToFishingSpot():
     print('Walk to fishing spot')
     holdKey('up', 2.2)
-    holdKey('right', 1.4)
+    holdKey('right', 1.2)
     holdKey('up', .4)
- #   holdKey('left', .4)
+    holdKey('left', .4)
 
 def catchFish():
     pressKey('down')
@@ -107,7 +107,7 @@ def kantoFish():
     print('Begin Kanto safari fish!')
     # interact with receptionist
     holdKey('up', .4)
-    talkToReceptionist()
+    #talkToReceptionist()
     # walk to fishing spot
     walkToFishingSpot()
     # start fishing loop
