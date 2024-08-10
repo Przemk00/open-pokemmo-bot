@@ -2,6 +2,12 @@ import pyautogui
 import time
 import sys
 import random
+import contextlib
+from PIL import Image
+import pytesseract
+import time
+import re
+import os
 
 from utils import *
 from constants import *
@@ -10,13 +16,13 @@ from config import *
 def checkPokedex():
     time.sleep(.2)
     pressKey('n')
-    time.sleep(1 + randomTime() * 3)
+    time.sleep(0.2 + randomTime() * 3)
     pressKey('n')
 
 def checkTrainer():
     time.sleep(.2)
     pressKey('c')
-    time.sleep(1 + randomTime() * 3)
+    time.sleep(0.2 + randomTime() * 3)
     pressKey('c')
 
 def talkToReceptionist():
@@ -26,65 +32,80 @@ def talkToReceptionist():
 
 def walkToFishingSpot():
     print('Walk to fishing spot')
-    holdKey('up', 2.2)
-    holdKey('right', 1.2)
+    holdKey('up', 1.2)
+    holdKey('right', 0.8)
     holdKey('up', .4)
-    holdKey('left', .4)
+ #   holdKey('left', .4)
 
 def catchFish():
-    pressKey('down')
-    pressKey('z')
-    # Check if the magikarp fled
-    for i in range(0, 4):
-        fledResult = pyautogui.locateOnScreen('poke_img/720_fled_from.png')
-        if (fledResult != None):
-            print('FLED:', fledResult)
-            return 'failed'
-    else:
-        time.sleep(.5)
-        pressKey('z')
-        # verify pokemon summary is shown
-        time.sleep(13)
-        for i in range(3):
-            pokeSummaryShown = pyautogui.locateOnScreen('poke_img/720_pokemon_summary_' + str(i) + '.png')
-            if (pokeSummaryShown != None):
-                print('Pokemon Summary', pokeSummaryShown)
+    while True:
+        time.sleep(2)
+        # Check for 'fled' resultz
+        with contextlib.suppress(pyautogui.ImageNotFoundException):
+            print("Checking for 'fled' result...")
+            fledResult = pyautogui.locateOnScreen('poke_img/720_fled_from.png', confidence=0.7)
+            #print(f"Fled result: {fledResult}")
+            if fledResult is not None:
+                print('FLED...')
+                pressKey('esc')
+                return 'failed'
+
+        # Check for 'summary' result
+        with contextlib.suppress(pyautogui.ImageNotFoundException):
+            print("Checking for 'summary' result...")
+            pokeSummaryShown = pyautogui.locateOnScreen('poke_img/720_pokemon_summary_0.png', confidence=0.6)
+            #print(f"Summary result: {pokeSummaryShown}")
+            if pokeSummaryShown is not None:
+                print('Pokemon caught!')
+                time.sleep(2)
                 return 'success'
-        return 'failed'
+            
+        print("No result yet, waiting or throwing another ball...")
 
 def tryToFish():
     print('Try to catch a fish')
-    # Randomize start time
-    time.sleep(randomTime())
     pressKey(OLD_ROD_KEY)
-    # Wait for fishing timer
-    time.sleep(2.2)
-    # Check if fish was hooked
-    for i in range(4):
-        noFishHooked = pyautogui.locateOnScreen('poke_img/720_not_even_a_nibble_' + str(i) + '.png')
-        fishIsHooked = pyautogui.locateOnScreen('poke_img/720_landed_a_pokemon_' + str(i) + '.png')
-        print('hooked', fishIsHooked, noFishHooked)
-        if (noFishHooked != None or fishIsHooked != None):
-            break
-    hooked = False
-    if (fishIsHooked != None):
-        hooked = True
-    elif (noFishHooked == None):
-        return 'Failed to identify hook'
-    if (hooked):
-        print('Fish is hooked!')
-        # Dismiss "Landed a Pokemon" message
+    time.sleep(5)
+    try:
+        # Check if fish is hooked or not
+        fishIsHooked = pyautogui.locateOnScreen('poke_img/720_landed_a_pokemon_0.png', confidence=0.6)
+    except pyautogui.ImageNotFoundException:
+        fishIsHooked = None 
+    try:
+        noFishHooked = pyautogui.locateOnScreen('poke_img/720_not_even_a_nibble_0.png', confidence=0.6)
+    except pyautogui.ImageNotFoundException:
+        noFishHooked = None
+    
+     # Check if either image was found
+    if fishIsHooked is not None:
+        print("Fish is hooked!")
+    elif noFishHooked is not None:
+        print("No fish hooked.")
+    else:
+        print("Failed to identify hook status. Neither fish hooked nor no fish hooked detected.")
+        return  # Exit the function if neither image was found
+        
+    if fishIsHooked is not None:
+        time.sleep(4.5)
         pressKey('z')
-        # Wait for battle to start
-        time.sleep(5.9)
+        time.sleep(5.5)
+        pressKey('down')
+        time.sleep(0.5)
+        pressKey('z')
+        time.sleep(4.5)
+        pressKey('up')
+        time.sleep(0.5)
+        pressKey('z')
+        time.sleep(0.5)
         result = catchFish()
-        if (result == 'success'):
-            time.sleep(randomTime())
+        if result == 'success':
+            time.sleep(2)
             # Dismiss summary screen
             pressKey('esc')
-            return result
-    else:
-        pressKey('z')
+        return result
+    else: 
+        time.sleep(2)
+        pressKey('x')
         return 'failed'
 
 def simpleFishLoop():
@@ -109,21 +130,16 @@ def kantoFish():
     holdKey('up', .4)
     #talkToReceptionist()
     # walk to fishing spot
-    walkToFishingSpot()
+    #walkToFishingSpot()
     # start fishing loop
     numFish = 30
-    while(numFish > 0):
-        num = randomTime()
-        if (num < .08):
-            checkPokedex()
-        elif (num > .95):
-            checkTrainer()
+    while (numFish > 0):
         result = tryToFish()
         print('Fish result:', result)
-        if (result == 'success'):
-            numFish -= 1
-        if (result == 'Failed to identify hook'):
+        if result == 'Failed to identify hook':
             return
+        elif result == 'success':
+            numFish -= 1
     # Finish safari sequence
     time.sleep(1)
     pressKey('esc')
@@ -158,7 +174,7 @@ def main():
     if (len(sys.argv) == 1):
         print("Loading default fisher")
         startCountDown()
-        kantoFish();
+        kantoFish()
     elif (sys.argv[1] == "fish"):
         print("Fishing...")
         startCountDown()
@@ -172,3 +188,4 @@ def main():
 
 if __name__ == "__main__":
     main()  
+2

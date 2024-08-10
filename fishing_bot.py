@@ -127,17 +127,6 @@ def catchFish():
                 print('Pokemon caught!')
                 time.sleep(2)
                 return 'success'
-
-        balls_left = capture_screen_and_read_balls()
-        if balls_left is not None:
-            if balls_left == 0:
-                print("No Pokéballs left, performing key presses.")
-                pressKey('down')
-                pressKey('right')
-                pressKey('z')
-                return 'quit'  # Exits the function and returns 'quit'
-            else:
-                print(f"Balls left: {balls_left}. Continuing with the process...")
             
         print("No result yet, waiting or throwing another ball...")
 
