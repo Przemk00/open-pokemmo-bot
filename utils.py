@@ -1,6 +1,7 @@
 import pyautogui
 import time
 import random
+import logging
 
 from config import *
 
@@ -46,3 +47,10 @@ def startCountDown():
         print(".", end="")
         time.sleep(1)
     print("Go")
+    
+# Set up logging
+logging.basicConfig(
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    level=logging.INFO
+)
+logger = logging.getLogger(__name__)

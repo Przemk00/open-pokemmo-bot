@@ -8,51 +8,53 @@ import pytesseract
 import time
 import re
 import os
+import logging
 
 from utils import *
 from constants import *
 from config import *
 
 def talkToReceptionist():
-    print('Talking to receptionist')
+    logger.info('Talking to receptionist...')
     pressKey('z', 11, 1.1)
     time.sleep(1.4)
 
 def walkToFishingSpot():
-    print('Walk to fishing spot')
+    logger.info('Walk to fishing spot...')
     holdKey('up', 1.5)
-    holdKey('right', 0.9)
+    holdKey('right', 1.0)
     holdKey('up', .4)
+ #   holdKey('left', .4)
 
 def catchFish():
     while True:
-        time.sleep(2)
-        # Check for 'fled' resultz
+        time.sleep(0.5)
+        # Check for 'fled' result
         with contextlib.suppress(pyautogui.ImageNotFoundException):
-            print("Checking for 'fled' result...")
+            logger.info("Checking for 'fled' result...")
             fledResult = pyautogui.locateOnScreen('poke_img/720_fled_from.png', confidence=0.7)
-            #print(f"Fled result: {fledResult}")
+            #logger.info(f"Fled result: {fledResult}")
             if fledResult is not None:
-                print('FLED...')
+                logger.info('FLED...')
                 pressKey('esc')
                 return 'failed'
 
         # Check for 'summary' result
         with contextlib.suppress(pyautogui.ImageNotFoundException):
-            print("Checking for 'summary' result...")
+            logger.info("Checking for 'summary'...")
             pokeSummaryShown = pyautogui.locateOnScreen('poke_img/720_pokemon_summary_0.png', confidence=0.6)
-            #print(f"Summary result: {pokeSummaryShown}")
+            #logger.info(f"Summary result: {pokeSummaryShown}")
             if pokeSummaryShown is not None:
-                print('Pokemon caught!')
+                logger.info('Pokemon caught!')
                 time.sleep(2)
                 return 'success'
             
-        print("No result yet, waiting or throwing another ball...")
+        logger.info("No result yet, waiting or throwing another ball...")
 
 def tryToFish():
-    print('Try to catch a fish')
+    logger.info('Try to catch a fish...')
     pressKey(OLD_ROD_KEY)
-    time.sleep(5)
+    time.sleep(4)
     try:
         # Check if fish is hooked or not
         fishIsHooked = pyautogui.locateOnScreen('poke_img/720_landed_a_pokemon_0.png', confidence=0.6)
@@ -65,17 +67,17 @@ def tryToFish():
     
      # Check if either image was found
     if fishIsHooked is not None:
-        print("Fish is hooked!")
+        logger.info("Fish is hooked...")
     elif noFishHooked is not None:
-        print("No fish hooked.")
+        logger.info("No fish hooked...")
     else:
-        print("Failed to identify hook status. Neither fish hooked nor no fish hooked detected.")
+        logger.info("Failed to identify hook status. Neither fish hooked nor no fish hooked detected...")
         return  # Exit the function if neither image was found
         
     if fishIsHooked is not None:
-        time.sleep(4.5)
+        time.sleep(3.5)
         pressKey('z')
-        time.sleep(5.5)
+        time.sleep(5.0)
         pressKey('down')
         time.sleep(0.5)
         pressKey('z')
@@ -85,7 +87,6 @@ def tryToFish():
         result = catchFish()
         if result == 'success':
             time.sleep(2)
-            # Dismiss summary screen
             pressKey('esc')
         return result
     else: 
@@ -103,25 +104,26 @@ def simpleFishLoop():
         numFish = 1
     while(numFish > 0):
         result = tryToFish()
-        print('Fish result:', result)
+        logger.info(f'Fish result: {result}')
         if (result == 'success'):
             numFish -= 1
-        if (result == 'Failed to identify hook'):
+        if (result == 'Failed to identify hook...'):
             return
 
 def kantoFish():
-    print('Begin Kanto safari fish!')
+    logger.info('Begin Kanto safari fish...')
     #holdKey('up', .4)
     #talkToReceptionist()
     walkToFishingSpot()
     numFish = 30
     while (numFish > 0):
         result = tryToFish()
-        print('Fish result:', result)
-        if result == 'Failed to identify hook':
+        logger.info(f'Fish result: {result}')
+        if result == 'Failed to identify hook...':
             return
         elif result == 'success':
             numFish -= 1
+            logger.info(f'No of fish caught: {numFish}')
     # Finish safari sequence
     time.sleep(1)
     pressKey('esc')
@@ -154,20 +156,19 @@ def main():
     pyautogui.FAILSAFE = True
 
     if (len(sys.argv) == 1):
-        print("Loading default fisher")
+        logger.info("Loading default fisher")
         startCountDown()
         kantoFish()
     elif (sys.argv[1] == "fish"):
-        print("Fishing...")
+        logger.info("Fishing...")
         startCountDown()
         simpleFishLoop()
     elif (sys.argv[1] == "payday"):
-        print("Payday time...")
+        logger.info("Payday time...")
         startCountDown()
         island2Payday()
 
-    print("Done")
+    logger.info("Done")
 
 if __name__ == "__main__":
     main()  
-2
