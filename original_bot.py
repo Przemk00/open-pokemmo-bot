@@ -126,12 +126,9 @@ def simpleFishLoop():
 
 def kantoFish():
     print('Begin Kanto safari fish!')
-    # interact with receptionist
     holdKey('up', .4)
-    #talkToReceptionist()
-    # walk to fishing spot
-    #walkToFishingSpot()
-    # start fishing loop
+    talkToReceptionist()
+    walkToFishingSpot()
     numFish = 30
     while (numFish > 0):
         result = tryToFish()
