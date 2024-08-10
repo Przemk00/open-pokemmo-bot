@@ -2,11 +2,73 @@ import pyautogui
 import time
 import sys
 import random
+import contextlib
+from PIL import Image
+import pytesseract
+import time
+import re
+import os
 
-from utils import *
+#from utils import *
 from constants import *
 from config import *
 
+def talkToReceptionist():
+    print('Talking to receptionist')
+    pressKey('z', 11, 1.1)
+    time.sleep(1.4)
+
+def walkToFishingSpot():
+    print('Walk to fishing spot')
+    holdKey('up', 2.2)
+    holdKey('right', 1.4)
+    holdKey('up', .4)
+
+def capture_screen_and_read_balls():
+    # Define the path where the screenshot will be saved
+    screenshot_path = os.path.join(os.getcwd(), "captured_screenshot.png")
+
+    # Capture a screenshot and save it
+    ss = pyautogui.screenshot(screenshot_path)
+    ss.save(screenshot_path)
+    #print(f"Screenshot captured and saved to {screenshot_path}")
+
+    # Add a delay to ensure the file is written to disk
+    time.sleep(1)
+
+    # Check if the file exists before trying to open it
+    if not os.path.exists(screenshot_path):
+        #print(f"Error: Screenshot file not found at {screenshot_path}")
+        return
+
+    # Load the screenshot
+    image = Image.open(screenshot_path)
+
+    # Use Tesseract to perform OCR on the image
+    text = pytesseract.image_to_string(image)
+
+    sanitized_text = re.sub(r'\s+', ' ', text).strip()
+
+    # Search for the specific part of the text that indicates the number of balls left
+    match = re.search(r'Attempt to catch\. \((\d+) left\.\)', sanitized_text, re.IGNORECASE)
+    if match:
+        balls_left = match.group(1)
+        print(f"Balls left: {balls_left}")
+    else:
+        print("Could not find the number of balls left.")
+
+def main():
+    time.sleep(3)  # Give yourself time to focus the window you want to capture
+    capture_screen_and_read_balls()
+
+if __name__ == "__main__":
+    main()
+
+def pressKey(key, duration=0.1):
+    pyautogui.keyDown(key)
+    time.sleep(duration)
+    pyautogui.keyUp(key)
+    
 def tryToFish():
     print('Try to catch a fish')
     pressKey(OLD_ROD_KEY)
@@ -48,32 +110,53 @@ def catchFish():
     while True:
         time.sleep(2)
         pressKey('z')
-        time.sleep(2.52)
-
-        try:
-            fledResult = pyautogui.locateOnScreen('poke_img/720_fled_from.png', confidence=0.6)
+        time.sleep(3.5)
+        # Check for 'fled' result
+        with contextlib.suppress(pyautogui.ImageNotFoundException):
+            print("Checking for 'fled' result...")
+            fledResult = pyautogui.locateOnScreen('poke_img/720_fled_from.png', confidence=0.7)
+            #print(f"Fled result: {fledResult}")
             if fledResult is not None:
-                print('FLED:', fledResult)
+                print('FLED...')
+                pressKey('esc')
                 return 'failed'
-        except pyautogui.ImageNotFoundException:
-            pass
 
-        try:
+        # Check for 'summary' result
+        with contextlib.suppress(pyautogui.ImageNotFoundException):
+            print("Checking for 'summary' result...")
             pokeSummaryShown = pyautogui.locateOnScreen('poke_img/720_pokemon_summary_0.png', confidence=0.6)
+            #print(f"Summary result: {pokeSummaryShown}")
             if pokeSummaryShown is not None:
-                print(f'Pokemon Summary Found at: {pokeSummaryShown}')
+                print('Pokemon caught!')
+                time.sleep(2)
                 return 'success'
-            else:
-                print('Summary not found, continuing...')
-        except pyautogui.ImageNotFoundException:
-            print('Summary ImageNotFoundException, continuing...')
 
-        print("No result yet, continuing to wait...")
-        time.sleep(0.5)
+        balls_left = capture_screen_and_read_balls()
+        if balls_left is not None:
+            if balls_left == 0:
+                print("No Pokéballs left, performing key presses.")
+                pressKey('down')
+                pressKey('right')
+                pressKey('z')
+                return 'quit'  # Exits the function and returns 'quit'
+            else:
+                print(f"Balls left: {balls_left}. Continuing with the process...")
+            
+        print("No result yet, waiting or throwing another ball...")
 
 def main():
     time.sleep(3)
-    tryToFish()
+    for i in range(30):
+            print(f"Attempt {i + 1} of 30:")
+            result = tryToFish()
+            if result == 'failed':
+                print("Attempt failed, moving to the next one.")
+            if result == 'quit':
+                sys.exit()
+            else:
+                print("Fish caught successfully!")
 
 if __name__ == "__main__":
     main()
+
+

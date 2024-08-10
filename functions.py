@@ -12,14 +12,14 @@ def capture_screen_and_read_balls():
     # Capture a screenshot and save it
     ss = pyautogui.screenshot(screenshot_path)
     ss.save(screenshot_path)
-    #print(f"Screenshot captured and saved to {screenshot_path}")
+    print(f"Screenshot captured and saved to {screenshot_path}")
 
     # Add a delay to ensure the file is written to disk
     time.sleep(1)
 
     # Check if the file exists before trying to open it
     if not os.path.exists(screenshot_path):
-        #print(f"Error: Screenshot file not found at {screenshot_path}")
+        print(f"Error: Screenshot file not found at {screenshot_path}")
         return
 
     # Load the screenshot
@@ -27,6 +27,10 @@ def capture_screen_and_read_balls():
 
     # Use Tesseract to perform OCR on the image
     text = pytesseract.image_to_string(image)
+
+    # Print the extracted text for debugging
+    print("Extracted Text:")
+    print(text)
 
     sanitized_text = re.sub(r'\s+', ' ', text).strip()
 
